@@ -2,42 +2,85 @@ package com.plee.demorest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.*;
 
 public class AlienRepository {
     List<Alien> aliens;
 
+    Connection con = null;
+
     public AlienRepository() {
-        aliens = new ArrayList<>();
+        String url = "jdbc:mysql://localhost:3306/restdb";
+        String username = System.getenv("DB_USERNAME");
+        String password = System.getenv("DB_PASSWORD");
 
-        Alien a1 = new Alien();
-        a1.setId(101);
-        a1.setName("Patrick");
-        a1.setPoints(60);
+        if(username == null || password == null) {
+            throw new IllegalArgumentException("Database credentials are not set.");
+        }
 
-        Alien a2 = new Alien();
-        a2.setId(102);
-        a2.setName("Angie");
-        a2.setPoints(70);
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection(url, username, password);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
 
-        aliens.add(a1);
-        aliens.add(a2);
     }
 
     public List<Alien> getAliens() {
+        List<Alien> aliens = new ArrayList<>();
+
+        String sql = "select * from alien";
+        try{
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()) {
+                Alien a = new Alien();
+                a.setId(rs.getInt(1));
+                a.setName(rs.getString(2));
+                a.setPoints(rs.getInt(3));
+
+                aliens.add(a);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
         return aliens;
     }
 
     public Alien getAlien(int id) {
-        for(Alien a : aliens) {
-            if(a.getId() == id) {
-                return a;
+        String sql = "select * from alien where id=" + id;
+        Alien a = new Alien();
+        try{
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()) {
+                a.setId(rs.getInt(1));
+                a.setName(rs.getString(2));
+                a.setPoints(rs.getInt(3));
             }
         }
+        catch (Exception e) {
+            System.out.println(e);
+        }
 
-        return null;
+        return a;
     }
 
     public void createAlien(Alien a1) {
-        aliens.add(a1);
+        String sql = "insert into alien values (?,?,?);";
+        try {
+            PreparedStatement st = con.prepareStatement(sql);
+            st.setInt(1, a1.getId());
+            st.setString(2, a1.getName());
+            st.setInt(3, a1.getPoints());
+            st.executeUpdate();
+        }
+        catch(Exception e) {
+            System.out.println(e);
+        }
     }
 }

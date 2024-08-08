@@ -85,6 +85,13 @@
             <version>2.3.2</version>
         </dependency>
 
+        <!-- MySQL Connector 8.0.33-->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.2.0</version>
+        </dependency>
+
     </dependencies>
     <properties>
         <jersey.version>2.35</jersey.version>
