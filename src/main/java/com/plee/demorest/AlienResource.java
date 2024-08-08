@@ -17,7 +17,7 @@ public class AlienResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/alien/{id}")
     @Produces(MediaType.APPLICATION_XML)
     public Alien getAlien(@PathParam("id") int id) {
         String message = String.format("getAlien with id %d called...", id);
